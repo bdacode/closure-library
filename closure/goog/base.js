@@ -18,9 +18,6 @@
  * In uncompiled mode base.js will write out Closure's deps file, unless the
  * global <code>CLOSURE_NO_DEPS</code> is set to true.  This allows projects to
  * include their own deps file(s) from different locations.
- *
- *
- * @provideGoog
  */
 
 

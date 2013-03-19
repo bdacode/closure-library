@@ -1297,6 +1297,9 @@ goog.events.wrapListener_ = function(listener) {
     return listener;
   }
 
+  // LOCALFIX: for compiler warning.
+  listener = /** @type {!Object} */ (listener)
+
   return listener[goog.events.LISTENER_WRAPPER_PROP_] ||
       (listener[goog.events.LISTENER_WRAPPER_PROP_] = function(e) {
         return listener.handleEvent(e);
