@@ -190,6 +190,7 @@ goog.style.getComputedStyle = function(element, property) {
  * @return {string} Style value.
  */
 goog.style.getCascadedStyle = function(element, style) {
+  // TODO(nicksantos): This should be documented to return null. #fixTypes
   return element.currentStyle ? element.currentStyle[style] : null;
 };
 
@@ -1164,25 +1165,51 @@ goog.style.clearTransparentBackgroundImage = function(el) {
  * stylesheet.
  * @param {Element} el Element to show or hide.
  * @param {*} display True to render the element in its default style,
- * false to disable rendering the element.
+ *     false to disable rendering the element.
+ * @deprecated Use goog.style.setElementShown instead.
  */
 goog.style.showElement = function(el, display) {
-  el.style.display = display ? '' : 'none';
+  goog.style.setElementShown(el, display);
+};
+
+
+/**
+ * Shows or hides an element from the page. Hiding the element is done by
+ * setting the display property to "none", removing the element from the
+ * rendering hierarchy so it takes up no space. To show the element, the default
+ * inherited display property is restored (defined either in stylesheets or by
+ * the browser's default style rules).
+ *
+ * Caveat 1: if the inherited display property for the element is set to "none"
+ * by the stylesheets, that is the property that will be restored by a call to
+ * setElementShown(), effectively toggling the display between "none" and
+ * "none".
+ *
+ * Caveat 2: if the element display style is set inline (by setting either
+ * element.style.display or a style attribute in the HTML), a call to
+ * setElementShown will clear that setting and defer to the inherited style in
+ * the stylesheet.
+ * @param {Element} el Element to show or hide.
+ * @param {*} isShown True to render the element in its default style,
+ *     false to disable rendering the element.
+ */
+goog.style.setElementShown = function(el, isShown) {
+  el.style.display = isShown ? '' : 'none';
 };
 
 
 /**
  * Test whether the given element has been shown or hidden via a call to
- * {@link #showElement}.
+ * {@link #setElementShown}.
  *
  * Note this is strictly a companion method for a call
- * to {@link #showElement} and the same caveats apply; in particular, this
+ * to {@link #setElementShown} and the same caveats apply; in particular, this
  * method does not guarantee that the return value will be consistent with
  * whether or not the element is actually visible.
  *
  * @param {Element} el The element to test.
  * @return {boolean} Whether the element has been shown.
- * @see #showElement
+ * @see #setElementShown
  */
 goog.style.isElementShown = function(el) {
   return el.style.display != 'none';
@@ -1560,9 +1587,9 @@ goog.style.getIePixelValue_ = function(element, value, name, pixelName) {
  * @private
  */
 goog.style.getIePixelDistance_ = function(element, propName) {
-  return goog.style.getIePixelValue_(element,
-      goog.style.getCascadedStyle(element, propName),
-      'left', 'pixelLeft');
+  var value = goog.style.getCascadedStyle(element, propName);
+  return value ?
+      goog.style.getIePixelValue_(element, value, 'left', 'pixelLeft') : 0;
 };
 
 

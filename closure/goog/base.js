@@ -19,6 +19,8 @@
  * global <code>CLOSURE_NO_DEPS</code> is set to true.  This allows projects to
  * include their own deps file(s) from different locations.
  *
+ *
+ * @provideGoog
  */
 
 
@@ -79,6 +81,20 @@ goog.LOCALE = 'en';  // default to en
 
 
 /**
+ * @define {boolean} Whether this code is running on trusted sites.
+ *
+ * On untrusted sites, several native functions can be defined or overridden by
+ * external libraries like Prototype, Datejs, and JQuery and setting this flag
+ * to false forces closure to use its own implementations when possible.
+ *
+ * If your javascript can be loaded by a third party site and you are wary about
+ * relying on non-standard implementations, specify
+ * "--define goog.TRUSTED_SITE=false" to the JSCompiler.
+ */
+goog.TRUSTED_SITE = true;
+
+
+/**
  * Creates object stubs for a namespace.  The presence of one or more
  * goog.provide() calls indicate that the file defines the given
  * objects/namespaces.  Build tools also scan for provide/require statements
@@ -115,6 +131,11 @@ goog.provide = function(name) {
 /**
  * Marks that the current file should only be used for testing, and never for
  * live code in production.
+ *
+ * In the case of unit tests, the message may optionally be an exact
+ * namespace for the test (e.g. 'goog.stringTest'). The linter will then
+ * ignore the extra provide (if not explicitly defined in the code).
+ *
  * @param {string=} opt_message Optional message to add to the error that's
  *     raised when used in production code.
  */
@@ -931,8 +952,7 @@ goog.removeUid = function(obj) {
  * @type {string}
  * @private
  */
-goog.UID_PROPERTY_ = 'closure_uid_' +
-    Math.floor(Math.random() * 2147483648).toString(36);
+goog.UID_PROPERTY_ = 'closure_uid_' + ((Math.random() * 1e9) >>> 0);
 
 
 /**
@@ -1059,13 +1079,14 @@ goog.bindJs_ = function(fn, selfObj, var_args) {
  * <pre>var barMethBound = bind(myFunction, myObj, 'arg1', 'arg2');
  * barMethBound('arg3', 'arg4');</pre>
  *
- * @param {Function} fn A function to partially apply.
- * @param {Object|undefined} selfObj Specifies the object which |this| should
+ * @param {?function(this:T, ...)} fn A function to partially apply.
+ * @param {T} selfObj Specifies the object which |this| should
  *     point to when the function is run.
  * @param {...*} var_args Additional arguments that are partially
  *     applied to the function.
  * @return {!Function} A partially-applied form of the function bind() was
  *     invoked as a method of.
+ * @template T
  * @suppress {deprecated} See above.
  */
 goog.bind = function(fn, selfObj, var_args) {
@@ -1136,7 +1157,7 @@ goog.mixin = function(target, source) {
  * @return {number} An integer value representing the number of milliseconds
  *     between midnight, January 1, 1970 and the current time.
  */
-goog.now = Date.now || (function() {
+goog.now = (goog.TRUSTED_SITE && Date.now) || (function() {
   // Unary plus operator converts its operand to a number which in the case of
   // a date is done by calling getTime().
   return +new Date();
