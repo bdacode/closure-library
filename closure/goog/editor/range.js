@@ -354,8 +354,13 @@ goog.editor.range.normalize = function(range) {
   return function() {
     if (!anchorPoint.node && anchorPreviousSibling) {
       // If anchorPoint.node was previously an empty text node with no siblings,
+<<<<<<< HEAD
       // anchorPreviousSibling may not have a nextSibling since that node will
       // no longer exist.  Do our best and point to the end of the previous
+=======
+      // anchorPreviousSibling may not have a nextSibling since that node will no
+      // longer exist.  Do our best and point to the end of the previous
+>>>>>>> Preserve selection polarity better.
       // element.
       anchorPoint.node = anchorPreviousSibling.nextSibling;
       if (!anchorPoint.node) {
