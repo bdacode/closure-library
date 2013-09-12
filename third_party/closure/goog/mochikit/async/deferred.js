@@ -638,7 +638,7 @@ goog.async.Deferred.prototype.fire_ = function() {
     // be canceled if another errback is appended before the timeout executes.
     // The error's original stack trace is preserved where available.
     this.unhandledExceptionTimeoutId_ = goog.async.Deferred.setTimeout_.call(
-        goog.global, goog.functions.error(res), 0);
+        goog.global, goog.functions.fail(res), 0);
   }
 };
 
